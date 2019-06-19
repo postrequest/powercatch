@@ -842,7 +842,7 @@ powershell_commands = WordCompleter(commandsToComplete,
 
 def usage():
     print("usage: powercatch <port_to_listen>")
-    print("eg: powercatcher 8001")
+    print("   eg: powercatcher 8001")
     sys.exit(1)
 
 def powercatch_help():
@@ -854,6 +854,7 @@ def powercatch_help():
     print("  quit                   Quits program")
     print("\nKey Combinations:")
     print("  Ctrl + \\               For Directory completion (Makes a directory request on each Key press)")
+    print("                         eg: PS > dir -Force <Ctrl + \\>")
     print("  Ctrl + c               Cancels command so that you can try again")
     print("  Ctrl + d               Quits program")
     print("\nFuture Commands To be Implemented:")
