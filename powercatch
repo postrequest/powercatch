@@ -979,10 +979,8 @@ def interactive_shell(port, proto):
         s.bind(("0.0.0.0", port))
         s.listen(1)
         conn, addr = s.accept()
-        prompt = receive_data(conn, udp)
         print('[*] Accepted connection from {} on port {}'.format(addr[0], addr[1]))
-    # add udp support
-    # udp does not support accept ... s.recvfrom after bind
+        prompt = receive_data(conn, udp)
     elif proto == "udp":
         udp = True
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -1042,7 +1040,6 @@ if __name__ == '__main__':
     if len(sys.argv) == 2:
         proto = "tcp"
     if len(sys.argv) == 3:
-        # UDP must be correctly implemented. Once done sys.argv[2] == "udp"
         if (sys.argv[2] == "tcp") or (sys.argv[2] == "udp"):
             proto = sys.argv[2]
         else:
