@@ -853,7 +853,7 @@ def powercatch_help():
     print("  exit                   Use exit command if you are in nested shell eg: if you called cmd within powershell")
     print("  quit                   Quits program")
     print("\nKey Combinations:")
-    print("  Ctrl + \\               For Directory completion (Makes a directory request on each Key press)")
+    print("  Ctrl + \\               For Directory completion (Makes a directory request on each key-combination press)")
     print("                         eg: PS > dir -Force <Ctrl + \\>")
     print("  Ctrl + c               Cancels command so that you can try again")
     print("  Ctrl + d               Quits program")

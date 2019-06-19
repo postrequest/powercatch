@@ -3,13 +3,14 @@
 Listen for (powershell.exe || cmd.exe) reverse shells!
 
 Humble features:
- - Tab completion
- - Ctrl-l to clear the screen
+ - Tab completion 
+ - (Ctrl-l or "clear" or "cls") clears the screen
  - History
+ - File and Folder completion with Ctrl + \ (Makes a directory request on each key-combination press)
+ - Type "PowerHelp" for Powercatch help commands (command not sent over the network)
 
 ### TODO:
-- Add support for folder && file completion
-- Add TLS support
+- Write a how to guide :)
 
 ### Install
 ```
