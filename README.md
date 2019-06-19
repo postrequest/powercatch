@@ -46,7 +46,7 @@ PS C:\Users\redteam\Desktop>
  - Type "PowerHelp" for Powercatch help commands (command not sent over the network)
 
 ### TODO:
-- Add UDP support
+- Add upload and download functionality
 
 ### Install
 ```

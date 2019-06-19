@@ -864,14 +864,23 @@ def powercatch_help():
 
 CurrentWorkingDirectory = ''
 CurrentShell = ''
+UDPRemoteAddr = ""
+UDPRemoteAddrRecv = False
 
-def receive_data(conn):
+def receive_data(conn, udp):
     global CurrentWorkingDirectory
     global CurrentShell
+    global UDPRemoteAddr
+    global UDPRemoteAddrRecv
     output = ""
     try:
         while True:
-            response = conn.recv(1024)
+            if (UDPRemoteAddrRecv == False) and (udp):
+                UDPRemoteAddrRecv = True
+                response, UDPRemoteAddr = conn.recvfrom(1024)
+                print('[*] Accepted connection from {} on port {}'.format(UDPRemoteAddr[0], UDPRemoteAddr[1]))
+            else:
+                response = conn.recv(1024)
             output += response.decode()
             # use a regex to find any "[a-zA-Z]:*>" this will include cmd
             found = re.search("[a-zA-Z]:.*>", output)
@@ -938,6 +947,8 @@ def interactive_shell(port, proto):
     global CurrentShell
     global powershell_commands
     global commandsToComplete
+    global UDPRemoteAddr
+    udp = False
     bindings = KeyBindings()
 
     @bindings.add('c-\\')
@@ -961,20 +972,23 @@ def interactive_shell(port, proto):
         except:
             pass
 
+    print("[*] listening on 0.0.0.0:%d" % port)
     if proto == "tcp":
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         s.bind(("0.0.0.0", port))
         s.listen(1)
+        conn, addr = s.accept()
+        prompt = receive_data(conn, udp)
+        print('[*] Accepted connection from {} on port {}'.format(addr[0], addr[1]))
     # add udp support
     # udp does not support accept ... s.recvfrom after bind
     elif proto == "udp":
+        udp = True
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.bind(("0.0.0.0", port))
-    print("[*] listening on 0.0.0.0:%d" % port)
-    conn, addr = s.accept()
-    print('[*] Accepted connection from {} on port {}'.format(addr[0], addr[1]))
-    prompt = receive_data(conn)
+        conn = s
+        prompt = receive_data(conn, udp)
     history = InMemoryHistory()
     session = PromptSession(completer=powershell_commands,
                             history=history,
@@ -1008,8 +1022,12 @@ def interactive_shell(port, proto):
                 sys.exit()
             if command[-1:] != "\n":
                 command += "\n"
-            conn.send(str.encode(command))
-            prompt = receive_data(conn)
+            if udp:
+                conn.sendto(str.encode(command), UDPRemoteAddr)
+                prompt = receive_data(conn, udp)
+            else:
+                conn.send(str.encode(command))
+                prompt = receive_data(conn, udp)
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
@@ -1025,7 +1043,7 @@ if __name__ == '__main__':
         proto = "tcp"
     if len(sys.argv) == 3:
         # UDP must be correctly implemented. Once done sys.argv[2] == "udp"
-        if (sys.argv[2] == "tcp") or (sys.argv[2] != "udp"):
+        if (sys.argv[2] == "tcp") or (sys.argv[2] == "udp"):
             proto = sys.argv[2]
         else:
             usage()
